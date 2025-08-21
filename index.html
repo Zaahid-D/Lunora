@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lunora</title>
+  <meta name="description" content="Lunora: Your Mental-Health Companion" />
+  <style>
+    :root{
+      --bg:#7aa6ff; --bg2:#4c67b7; --bg3:#054ea7;
+      --ac:#5bc0eb; --ac2:#7aa6ff; --txt:#eaf2ff; --muted:#b6c4e1;
+      --good:#22c55e; --warn:#f59e0b; --bad:#ef4444;
+      --glass: rgba(255,255,255,.08); --border: 1px solid rgba(255,255,255,.10);
+      --radius: 18px; --shadow: 0 10px 30px rgba(7, 12, 26, .45);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Inter, Roboto, Helvetica, Arial;
+      color:var(--txt);
+      background: radial-gradient(1200px 700px at 20% -10%, #1e2a52 0%, transparent 60%),
+                  radial-gradient(900px 600px at 90% 10%, #163058 0%, transparent 60%),
+                  linear-gradient(160deg, var(--bg), var(--bg2));
+      background-attachment: fixed;
+    }
+    a{color:inherit}
+    .container{max-width:1160px; margin:0 auto; padding:22px}
+
+    /* ===== Top Navigation ===== */
+    header{position:sticky; top:0; z-index:60; backdrop-filter: blur(8px);
+      background: linear-gradient(180deg, rgba(6,12,26,.78), rgba(6,12,26,.30)); border-bottom:var(--border)}
+    .nav{display:flex; align-items:center; justify-content:space-between; gap:16px}
+    .brand{display:flex; align-items:center; gap:12px; text-decoration:none}
+    .logo{width:44px; height:44px; border-radius:12px; display:grid; place-items:center; color:#0b1225; font-weight:800;
+      background: conic-gradient(from 210deg, var(--ac), #7ad3ff, var(--ac2), var(--ac))}
+    .brand span{font-weight:800; letter-spacing:.5px}
+
+    .navlinks{display:flex; gap:8px; align-items:center; justify-content:center; flex:1}
+    .navitem{border:none; border-radius:12px; padding:10px 12px; cursor:pointer; color:var(--txt); background:transparent; position:relative; font-weight:700}
+    .navitem:hover{background:rgba(255,255,255,.06)}
+    .navitem.active::after{content:""; position:absolute; left:10px; right:10px; bottom:-8px; height:3px; border-radius:999px; background:linear-gradient(90deg, var(--ac), var(--ac2))}
+
+    .actions{display:flex; gap:10px; flex-wrap:wrap}
+    .btn{border:none; padding:10px 14px; border-radius:12px; cursor:pointer; color:#08101f; font-weight:700}
+    .btn.primary{background:linear-gradient(180deg, var(--ac), var(--ac2))}
+    .btn.ghost{background:rgba(255,255,255,.1); color:var(--txt); border:var(--border)}
+
+    /* Navbar logo styling */
+.logo img {
+  height: 40px;           /* default height */
+  width: auto;            /* maintain aspect ratio */
+  display: block;
+  margin-right: 10px;     /* space between logo and text */
+}
+
+/* Optional: make it smaller on mobile */
+@media (max-width: 600px) {
+  .logo img {
+    height: 30px;
+    margin-right: 5px;
+  }
+}
+    /* ===== Router ===== */
+    [data-page]{display:none}
+    [data-page].active{display:block}
+
+    /* ===== Layout Components ===== */
+    .card{background:var(--glass); border:var(--border); border-radius:var(--radius); box-shadow:var(--shadow)}
+    .p16{padding:16px} .p20{padding:20px} .p24{padding:24px}
+    .grid{display:grid; gap:18px} .grid.cols-2{grid-template-columns:repeat(2,1fr)} .grid.cols-3{grid-template-columns:repeat(3,1fr)}
+    .tile{padding:18px; border-radius:16px; background:rgba(255,255,255,.06); border:var(--border); cursor:pointer; transition:transform .18s ease, background .2s ease}
+    .tile:hover{transform: translateY(-2px); background:rgba(255,255,255,.10)}
+    .pill{display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px; background:rgba(91,192,235,.18); color:#dff3ff; border:1px solid rgba(91,192,235,.35); font-weight:700}
+    .headline{font-size:34px; line-height:1.1; margin:0 0 8px}
+    .sub{color:var(--muted); margin:0 0 12px}
+    .meta{font-size:12px; color:var(--muted)}
+
+    /* ===== Dashboard ===== */
+    .hero{display:grid; grid-template-columns:1.1fr .9fr; gap:22px; align-items:stretch; padding:26px 0}
+    .stats{display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:12px}
+    .stat{padding:12px; border-radius:14px; background:rgba(255,255,255,.06); border:var(--border); text-align:center}
+    .stat .v{font-size:22px; font-weight:800}
+    .mood-emoji{font-size:28px}
+    .spark{width:100%; height:48px}
+
+    /* Forms */
+    .form-row{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+    .input{padding:12px; border-radius:12px; border:var(--border); background:rgba(255,255,255,.06); color:var(--txt)}
+    .journal-area{width:100%; min-height:160px; resize:vertical; background:rgba(255,255,255,.06); color:var(--txt); border:var(--border); border-radius:14px; padding:12px; outline:none}
+
+    /* Avatars */
+    .avatar{width:90px; height:90px; border-radius:20px; background:rgba(255,255,255,.1); display:grid; place-items:center; overflow:hidden; border:var(--border)}
+    .avatar img{width:100%; height:100%; object-fit:cover}
+
+    /* Chips / Quests */
+    .chip{display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; background:rgba(255,255,255,.08); border:var(--border); font-size:12px}
+    .quest{display:flex; align-items:flex-start; gap:10px; padding:10px; background:rgba(255,255,255,.06); border:var(--border); border-radius:12px}
+
+    /* SOS */
+    .sos-banner{padding:12px; border-radius:12px; border:var(--border); background:linear-gradient(180deg, rgba(239,68,68,.12), rgba(239,68,68,.06)); color:#ffdede}
+
+    /* Modal */
+    .modal{position:fixed; inset:0; display:none; place-items:center; background:rgba(5,10,20,.55); backdrop-filter: blur(6px); z-index:100}
+    .modal.active{display:grid}
+    .modal .panel{width:min(600px, 92vw)}
+
+    /* Animations */
+    .fade-in{animation:fade .6s ease both}
+    @keyframes fade{from{opacity:0; transform: translateY(6px)} to{opacity:1; transform:none}}
+    .pulse{animation:pulse 2s ease-in-out infinite}
+    @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(91,192,235,.5)} 50%{box-shadow:0 0 0 10px rgba(91,192,235,0)}}
+
+    /* Responsive */
+    @media (max-width:980px){ .hero{grid-template-columns:1fr} .grid.cols-3{grid-template-columns:1fr} .grid.cols-2{grid-template-columns:1fr} .stats{grid-template-columns:1fr 1fr} .navlinks{display:none} }
+
+    footer{padding:28px 0; color:var(--muted); text-align:center; font-size:12px}
+
+    /* Confetti */
+    .confetti{position:fixed; inset:0; pointer-events:none; z-index:120; font-size:22px}
+
+    /* Tooltips */
+    .hint{position:absolute; background:#0f1b3e; border:var(--border); color:var(--txt); padding:8px 10px; border-radius:10px; font-size:12px; box-shadow:var(--shadow)}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container nav">
+      <a class="brand" href="#" onclick="navTo('dashboard')" title="Go to Dashboard">
+        <div class="logo">
+            <img src="logo.png" alt="Lunora Logo">
+        </div>
+
+        <span>Lunora</span>
+      </a>
+      <nav class="navlinks">
+        <button class="navitem active" data-link="dashboard">🏠 Dashboard</button>
+        <button class="navitem" data-link="profile">👤 Profile</button>
+        <button class="navitem" data-link="journal">📓 Journal</button>
+        <button class="navitem" data-link="quests">✅ Tasks</button>
+        <button class="navitem" data-link="breathing">🌬 Breathing</button>
+        <button class="navitem" data-link="sos">🚨 SOS</button>
+      </nav>
+      <div class="actions">
+        <button class="btn ghost" id="exportBtn">Export Data</button>
+        <button class="btn primary" id="breathQuick">Calm Breathing</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- DASHBOARD -->
+    <section id="dashboard" data-page class="fade-in active">
+      <div class="hero">
+        <div class="card p24">
+          <div class="pill">AI for Good • Mental Wellness</div>
+          <h1 class="headline">Hey <span id="helloName">there</span> — welcome back to <strong>Lunora</strong></h1>
+          <p class="sub">Your gentle space to write, reflect, and build healthy rituals. All data stays in your browser.</p>
+          <div class="stats">
+            <div class="stat">
+              <div class="meta">Points</div>
+              <div class="v" id="dPoints">0</div>
+            </div>
+            <div class="stat">
+              <div class="meta">Streak</div>
+              <div class="v"><span id="dStreak">0</span> days</div>
+            </div>
+            <div class="stat">
+              <div class="meta">Last Mood</div>
+              <div class="v" id="dMood">—</div>
+            </div>
+            <div class="stat">
+              <div class="meta">Mood Emoji</div>
+              <div class="v mood-emoji" id="dMoodEmoji">—</div>
+            </div>
+          </div>
+          <canvas id="spark" class="spark" aria-label="Mood trend graph"></canvas>
+        </div>
+        <div class="card p24" style="position:relative">
+          <h3 style="margin:0 0 12px">Quick Actions</h3>
+          <div class="grid cols-2">
+            <div class="tile" onclick="navTo('journal')">
+              <div class="icon">📓</div>
+              <div style="font-weight:700">Open Journal</div>
+              <div class="meta">Write and get supportive tips</div>
+            </div>
+            <div class="tile" onclick="openBreathing()">
+              <div class="icon">🧘</div>
+              <div style="font-weight:700">Start Breathing</div>
+              <div class="meta">2‑minute calm exercise</div>
+            </div>
+            <div class="tile" onclick="navTo('quests')">
+              <div class="icon">🎯</div>
+              <div style="font-weight:700">Daily Quests</div>
+              <div class="meta">Complete 3 to grow streak</div>
+            </div>
+            <div class="tile" onclick="navTo('sos')">
+              <div class="icon">🚨</div>
+              <div style="font-weight:700">SOS & Safety</div>
+              <div class="meta">Configure a trusted contact</div>
+            </div>
+            <div class="tile" onclick="navTo('profile')">
+              <div class="icon">👤</div>
+              <div style="font-weight:700">Edit Profile</div>
+              <div class="meta">Name, goals, avatar</div>
+            </div>
+            <div class="tile" onclick="navTo('entries')">
+              <div class="icon">🗂️</div>
+              <div style="font-weight:700">View Entries</div>
+              <div class="meta">See your past notes</div>
+            </div>
+          </div>
+          <!-- Onboarding hint bubble -->
+          <div id="hintQA" class="hint" style="display:none; right:16px; top:-8px">Try these quick actions to explore ✨</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROFILE -->
+    <section id="profile" data-page class="card p24 fade-in">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:12px">
+        <div>
+          <h2 style="margin:0 0 6px">Profile</h2>
+          <p class="sub">Set up your space. Your info stays on this device.</p>
+        </div>
+        <button class="btn ghost" onclick="navTo('dashboard')">← Back to Dashboard</button>
+      </div>
+      <div style="display:flex; gap:16px; align-items:center; margin-bottom:10px; position:relative">
+        <label class="avatar pulse">
+          <input id="avatarInput" type="file" accept="image/*" style="display:none">
+          <img id="avatarImg" alt="avatar"/>
+          <span id="avatarFallback">Add Photo</span>
+        </label>
+        <button class="btn ghost" onclick="document.getElementById('avatarInput').click()">Upload Avatar</button>
+        <div id="hintProfile" class="hint" style="display:none; left:120px; top:-10px">Start here: add your name & contact</div>
+      </div>
+      <div class="form-row">
+        <input class="input" id="name" placeholder="Your name"/>
+        <input class="input" id="age" placeholder="Age"/>
+      </div>
+      <input class="input" id="goals" placeholder="Your wellbeing goal (e.g., reduce stress)"/>
+      <div class="form-row">
+        <input class="input" id="ecName" placeholder="Emergency contact name"/>
+        <input class="input" id="ecMethod" placeholder="Phone or email"/>
+      </div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:6px">
+        <button class="btn primary" id="saveProfile">Save Profile</button>
+        <button class="btn ghost" onclick="navTo('dashboard')">Back to Dashboard</button>
+      </div>
+      <div id="profileSaved" class="meta" style="margin-top:8px"></div>
+    </section>
+
+    <!-- JOURNAL -->
+    <section id="journal" data-page class="card p24 fade-in">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:12px">
+        <div>
+          <h2 style="margin:0 0 6px">Journal</h2>
+          <p class="sub">Write anything on your mind. Lunora highlights cues and suggests gentle steps.</p>
+        </div>
+        <button class="btn ghost" onclick="navTo('dashboard')">← Back to Dashboard</button>
+      </div>
+      <textarea id="journalInput" class="journal-area" placeholder="Start typing…"></textarea>
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:10px">
+        <div class="meta"><span id="charCount">0</span> chars • <span id="moodScore">Mood: —</span></div>
+        <div style="display:flex; gap:8px">
+          <button class="btn ghost" id="analyzeBtn">Analyze ✨</button>
+          <button class="btn primary" id="saveEntryBtn">Save Entry</button>
+        </div>
+      </div>
+      <div id="aiOutput" class="grid" style="margin-top:12px"></div>
+      <div id="sosInlineBanner" class="sos-banner" style="display:none; margin-top:12px">
+        <strong>⚠️ We’re concerned.</strong> We detected strong distress language. Consider contacting your emergency person now.
+        <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap">
+          <button class="btn primary" onclick="openSOS()">Contact Now</button>
+          <button class="btn ghost" onclick="navTo('sos')">Open SOS Page</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- QUESTS -->
+    <section id="quests" data-page class="card p24 fade-in">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:12px">
+        <div>
+          <h2 style="margin:0 0 6px">Daily Quests</h2>
+          <p class="sub">Complete today’s 3 cards to grow your streak.</p>
+        </div>
+        <button class="btn ghost" onclick="navTo('dashboard')">← Back to Dashboard</button>
+      </div>
+      <div id="questsList" class="grid"></div>
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-top:12px">
+        <div class="chip">⭐ Points: <span id="points">0</span></div>
+        <div class="chip">🔥 Streak: <span id="streak">0</span> days</div>
+      </div>
+      <div id="badges" class="grid" style="margin-top:12px; grid-template-columns:repeat(4, minmax(0,1fr))"></div>
+    </section>
+
+    <!-- BREATHING (as its own page trigger + modal player) -->
+    <section id="breathing" data-page class="card p24 fade-in">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:12px">
+        <div>
+          <h2 style="margin:0 0 6px">Calm Breathing</h2>
+          <p class="sub">Follow the ring: Inhale 4s • Hold 4s • Exhale 6s</p>
+        </div>
+        <button class="btn ghost" onclick="navTo('dashboard')">← Back to Dashboard</button>
+      </div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap">
+        <button class="btn primary" onclick="openBreathing()">Start Session</button>
+        <button class="btn ghost" onclick="toggleQuest('breathe', true)">Mark Done</button>
+      </div>
+    </section>
+
+    <!-- SOS -->
+    <section id="sos" data-page class="card p24 fade-in">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:12px">
+        <div>
+          <h2 style="margin:0 0 6px">Safety & SOS</h2>
+          <p class="sub">If Lunora detects high‑risk language, it will nudge you to reach out. You can also contact your person anytime.</p>
+        </div>
+        <button class="btn ghost" onclick="navTo('dashboard')">← Back to Dashboard</button>
+      </div>
+      <div class="sos-banner" id="sosBanner" style="display:none">
+        <strong>⚠️ We’re concerned.</strong> We detected strong distress language. Consider contacting <span id="contactNameBanner"></span> now, or dial your local emergency number.
+        <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap">
+          <button class="btn primary" id="contactNowBtn">Contact Now</button>
+          <button class="btn ghost" id="showResourcesBtn">See Resources</button>
+        </div>
+      </div>
+      <div class="grid cols-2" style="margin-top:12px">
+        <div class="card p16">
+          <h4 style="margin:0 0 8px">Emergency Contact</h4>
+          <div class="form-row">
+            <input class="input" id="sosName" placeholder="Name"/>
+            <input class="input" id="sosMethod" placeholder="Phone or Email"/>
+          </div>
+          <div style="display:flex; gap:8px; margin-top:10px">
+            <button class="btn primary" id="saveContactBtn">Save Contact</button>
+            <button class="btn ghost" id="testSOSBtn">Test SOS</button>
+          </div>
+          <div id="sosTip" class="meta" style="margin-top:8px"></div>
+        </div>
+        <div class="card p16">
+          <h4 style="margin:0 0 8px">Resources</h4>
+          <div id="resources" class="meta">
+            <p><strong>If you are in immediate danger, call your local emergency number.</strong> This prototype does not replace professional help.</p>
+            <ul>
+              <li>Talk to a trusted person or counselor.</li>
+              <li>Use local or national crisis helplines in your country.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ENTRIES -->
+    <section id="entries" data-page class="card p24 fade-in">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:12px">
+        <div>
+          <h2 style="margin:0 0 6px">Your Entries</h2>
+          <p class="sub">Saved locally on this device.</p>
+        </div>
+        <button class="btn ghost" onclick="navTo('dashboard')">← Back to Dashboard</button>
+      </div>
+      <div id="entriesList" class="grid"></div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">© <span id="year"></span> Lunora • Demo prototype • All data stays in your browser</div>
+  </footer>
+
+  <!-- Breathing Modal -->
+  <div class="modal" id="breathModal" aria-hidden="true" role="dialog">
+    <div class="panel card p24">
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:10px">
+        <h3 style="margin:0">Calm Breathing</h3>
+        <button class="btn ghost" id="closeBreath">Close</button>
+      </div>
+      <p class="sub">Follow the ring: Inhale 4s • Hold 4s • Exhale 6s</p>
+      <div style="display:grid; place-items:center; padding:20px">
+        <svg id="breathSVG" width="240" height="240" viewBox="0 0 240 240">
+          <circle cx="120" cy="120" r="90" stroke="rgba(255,255,255,.2)" stroke-width="10" fill="none"/>
+          <circle id="breathAnim" cx="120" cy="120" r="90" stroke="url(#grad)" stroke-width="10" fill="none" stroke-linecap="round" stroke-dasharray="0 1000"/>
+          <defs>
+            <linearGradient id="grad" x1="0" x2="1">
+              <stop offset="0%" stop-color="#5bc0eb"/>
+              <stop offset="100%" stop-color="#7aa6ff"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- SOS Compose Modal -->
+  <div class="modal" id="sosModal" aria-hidden="true" role="dialog">
+    <div class="panel card p24">
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:10px">
+        <h3 style="margin:0">Contact <span id="dlgSOSName"></span></h3>
+        <button class="btn ghost" id="closeSOS">Close</button>
+      </div>
+      <p class="sub">Copy the message below or open your email app.</p>
+      <textarea id="sosMessage" class="journal-area" style="min-height:120px"></textarea>
+      <div style="display:flex; gap:8px; margin-top:10px">
+        <button class="btn primary" id="copySOS">Copy Message</button>
+        <button class="btn ghost" id="emailSOS">Open Email</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Intro / About Modal -->
+  <div class="modal" id="aboutModal" aria-hidden="true" role="dialog">
+    <div class="panel card p24">
+      <h2 style="margin:0 0 6px">Welcome to Lunora 🌙</h2>
+      <p class="sub">An AI‑for‑Good prototype that supports mental wellness with journaling, gentle insights, healthy habits, and an SOS safety net. All data stays on your device.</p>
+      <ul class="meta" style="margin-top:8px">
+        <li>Start in <strong>Profile</strong> to save your name and contact.</li>
+        <li>Write in <strong>Journal</strong> to get supportive suggestions.</li>
+        <li>Complete <strong>Tasks</strong> to earn points and build a streak.</li>
+      </ul>
+      <div style="display:flex; gap:10px; margin-top:12px">
+        <button class="btn primary" id="startNow">Start — Create Profile</button>
+        <button class="btn ghost" id="closeAbout">Skip for now</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="confetti" id="confetti"></div>
+
+  <script>
+    // ======= Shortcuts =======
+    const $ = s=>document.querySelector(s), $$ = s=>Array.from(document.querySelectorAll(s));
+    const STORAGE = { entries:'lunora_entries', points:'lunora_points', streak:'lunora_streak', lastQuestDate:'lunora_lastQuestDate', questsState:'lunora_quests', profile:'lunora_profile', avatar:'lunora_avatar', firstRun:'lunora_firstRun' };
+    const todayKey = ()=> new Date().toISOString().slice(0,10);
+    const load=(k,f)=>{try{return JSON.parse(localStorage.getItem(k))??f}catch(e){return f}};
+    const save=(k,v)=>localStorage.setItem(k, JSON.stringify(v));
+
+    // ======= Navigation =======
+    function setActiveNav(id){ $$('.navitem').forEach(n=> n.classList.toggle('active', n.dataset.link===id)); }
+    function navTo(id){
+      $('[data-page].active')?.classList.remove('active');
+      document.getElementById(id).classList.add('active');
+      setActiveNav(id);
+      if(id==='entries') renderEntries();
+      if(id==='quests') renderQuests();
+      if(id==='journal') $('#journalInput').focus();
+      if(id==='profile') renderProfile();
+      if(id==='sos') renderContact();
+    }
+    $$('.navitem').forEach(b=> b.addEventListener('click', ()=> navTo(b.dataset.link)));
+
+    // ======= Keyword Sets =======
+    const KEYWORDS={
+      positive:['grateful','calm','hopeful','excited','proud','joy','happy','relaxed','content','love','progress','improved'],
+      negative:['sad','down','anxious','panic','lonely','tired','overwhelmed','stressed','angry','worried','nervous','guilty','ashamed','depressed','worthless','failure','burnt','broken','ill','drained','frustrated'],
+      risk:['suicide','suicidal','kill myself','end it','die','don\'t want to live','self-harm','hurt myself','hopeless','no way out','goodbye forever']
+    };
+
+    // ======= Dashboard sparkline =======
+    function renderSpark(){
+      const cvs = $('#spark'); const ctx = cvs.getContext('2d');
+      const w = cvs.width = cvs.clientWidth; const h = cvs.height = cvs.clientHeight;
+      const entries = load(STORAGE.entries, []);
+      const scores = entries.slice(0,20).map(e=> analyzeText(e.text).score).reverse();
+      ctx.clearRect(0,0,w,h);
+      if(!scores.length) return;
+      const min = Math.min(...scores, -6), max = Math.max(...scores, 6);
+      const nx = i => i/(scores.length-1||1) * (w-10) + 5;
+      const ny = v => h - ((v-min)/(max-min||1)) * (h-10) - 5;
+      ctx.lineWidth = 2; ctx.strokeStyle = '#7aa6ff'; ctx.beginPath();
+      scores.forEach((v,i)=>{ const x=nx(i), y=ny(v); i?ctx.lineTo(x,y):ctx.moveTo(x,y) });
+      ctx.stroke();
+    }
+
+    // ======= Profile =======
+    function renderProfile(){
+      const p = load(STORAGE.profile, {});
+      $('#name').value = p.name||''; $('#age').value = p.age||''; $('#goals').value = p.goals||'';
+      $('#ecName').value = p.ecName||''; $('#ecMethod').value = p.ecMethod||'';
+      const a = localStorage.getItem(STORAGE.avatar);
+      if(a){ $('#avatarImg').src = a; $('#avatarImg').style.display='block'; $('#avatarFallback').style.display='none'; }
+      else { $('#avatarImg').style.display='none'; $('#avatarFallback').style.display='grid'; }
+    }
+    $('#avatarInput').addEventListener('change', e=>{
+      const file = e.target.files[0]; if(!file) return;
+      const rd = new FileReader(); rd.onload = ()=>{ localStorage.setItem(STORAGE.avatar, rd.result); renderProfile(); updateDashboard(); };
+      rd.readAsDataURL(file);
+    });
+    $('#saveProfile').addEventListener('click', ()=>{
+      const p={ name:$('#name').value.trim(), age:$('#age').value.trim(), goals:$('#goals').value.trim(), ecName:$('#ecName').value.trim(), ecMethod:$('#ecMethod').value.trim() };
+      if(!p.name || !p.ecName || !p.ecMethod){ alert('Please fill name and emergency contact.'); return; }
+      save(STORAGE.profile, p); $('#profileSaved').textContent = 'Profile saved ✓'; updateDashboard(); toast('Profile saved');
+      localStorage.setItem(STORAGE.firstRun, JSON.stringify({done:true}));
+    });
+
+    // ======= Journal =======
+    const journalInput = $('#journalInput');
+    journalInput.addEventListener('input', ()=>{ $('#charCount').textContent = journalInput.value.length; liveRiskCheck(journalInput.value) });
+    $('#analyzeBtn').addEventListener('click', ()=> renderAI(journalInput.value));
+    $('#saveEntryBtn').addEventListener('click', ()=>{
+      const text = journalInput.value.trim(); if(!text){ alert('Write something first.'); return; }
+      const entry = { id: crypto.randomUUID(), date:new Date().toISOString(), text };
+      const entries = load(STORAGE.entries, []); entries.unshift(entry); save(STORAGE.entries, entries);
+      renderEntries(); renderAI(text); journalInput.value=''; $('#charCount').textContent=0; toast('Entry saved');
+      if(text.length>=120) toggleQuest('journal', true);
+      updateDashboard();
+    });
+
+    function analyzeText(text){
+      const clean = text.toLowerCase();
+      let score=0; let matched={positive:[], negative:[], risk:[]};
+      for(const p of KEYWORDS.positive){ if(clean.includes(p)){ score+=2; matched.positive.push(p) } }
+      for(const n of KEYWORDS.negative){ if(clean.includes(n)){ score-=2; matched.negative.push(n) } }
+      for(const r of KEYWORDS.risk){ if(clean.includes(r)){ score-=6; matched.risk.push(r) } }
+      let moodLabel='Neutral', moodColor='var(--muted)';
+      if(score>=3){ moodLabel='Positive'; moodColor='var(--good)'; }
+      else if(score<=-3){ moodLabel='Low'; moodColor='var(--bad)'; }
+      else { moodLabel='Mixed'; moodColor='var(--warn)'; }
+      return {score, moodLabel, moodColor, matched};
+    }
+
+    function moodEmoji(label){
+      return label==='Positive'?'😊':label==='Low'?'😔':label==='Mixed'?'😐':'—';
+    }
+
+    function renderAI(text){
+      const out = $('#aiOutput'); out.innerHTML=''; if(!text.trim()) return;
+      const {score, moodLabel, moodColor, matched} = analyzeText(text);
+      $('#moodScore').textContent = `Mood: ${moodLabel}`; $('#moodScore').style.color=moodColor;
+
+      const chips=[...matched.positive.map(w=>`<span class=\"chip\">😊 ${w}</span>`), ...matched.negative.map(w=>`<span class=\"chip\">🌧️ ${w}</span>`), ...matched.risk.map(w=>`<span class=\"chip\">⚠️ ${w}</span>`)];
+      if(chips.length){ out.insertAdjacentHTML('beforeend', `<div class=\"meta\">Detected cues:</div><div style=\"display:flex;flex-wrap:wrap;gap:6px\">${chips.join('')}</div>`); }
+
+      const tips=[];
+      if(matched.risk.length){ tips.push({icon:'🛟',title:'You\'re not alone',body:'Consider talking to someone you trust or a professional. If you\'re in immediate danger, call your local emergency number.'});
+        $('#sosBanner').style.display='block'; $('#sosInlineBanner').style.display='block'; const c=load(STORAGE.profile,{}); $('#contactNameBanner').textContent=c.ecName||'your emergency contact'; }
+      else { $('#sosBanner').style.display='none'; $('#sosInlineBanner').style.display='none'; }
+      if(score<=-3){ tips.push({icon:'🌤️',title:'Tiny step now',body:'Try a 2‑minute breathing exercise and write one small action for the next hour.'}); tips.push({icon:'📓',title:'Reframe prompt',body:'What would you say to a friend feeling this way? Write that to yourself.'}); }
+      if(score>=3){ tips.push({icon:'🎯',title:'Build on this',body:'Pick one health habit quest to complete now to lock in momentum.'}); }
+      tips.push({icon:'💧',title:'Hydration check',body:'Drink a glass of water and notice how you feel.'});
+
+      tips.forEach(t=> out.insertAdjacentHTML('beforeend', `<div class=\"card p16\"><div style=\"display:flex;gap:10px;align-items:flex-start\"><div style=\"font-size:20px\">${t.icon}</div><div><div style=\"font-weight:700;margin-bottom:4px\">${t.title}</div><div class=\"meta\">${t.body}</div></div></div></div>`));
+    }
+
+    function liveRiskCheck(text){
+      const cleaned = text.toLowerCase();
+      const risky = KEYWORDS.risk.some(w=> cleaned.includes(w));
+      if(risky){ $('#sosBanner').style.display='block'; $('#sosInlineBanner').style.display='block'; const p=load(STORAGE.profile,{}); $('#contactNameBanner').textContent=p.ecName||'your emergency contact'; }
+    }
+
+    // ======= Entries =======
+    function renderEntries(){
+      const entries = load(STORAGE.entries, []);
+      const list = $('#entriesList');
+      if(!entries.length){ list.innerHTML = '<div class="meta">No entries yet. Your saved notes will appear here.</div>'; renderSpark(); return; }
+      list.innerHTML='';
+      for(const e of entries){
+        const {moodLabel, moodColor} = analyzeText(e.text);
+        const date = new Date(e.date).toLocaleString();
+        const card = document.createElement('div'); card.className='card p16';
+        card.innerHTML = `
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:10px">
+            <div style="display:flex; align-items:center; gap:10px">
+              <span class="chip" style="border-color:${moodColor}; color:${moodColor}; background:rgba(255,255,255,.06)">${moodLabel}</span>
+              <div class="meta">${date}</div>
+            </div>
+            <button class="btn ghost" data-del="${e.id}">Delete</button>
+          </div>
+          <div style="margin-top:8px; white-space:pre-wrap">${escapeHtml(e.text)}</div>`;
+        list.appendChild(card);
+      }
+      $$('#entriesList [data-del]').forEach(btn=> btn.addEventListener('click', ()=>{
+        const id = btn.getAttribute('data-del');
+        const entries = load(STORAGE.entries, []).filter(x=>x.id!==id); save(STORAGE.entries, entries); renderEntries(); updateDashboard();
+      }));
+      renderSpark();
+    }
+    function escapeHtml(s){ return s.replace(/[&<>\"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;','\'':'&#39;'}[m])); }
+
+    // ======= Quests =======
+    const QUEST_POOL=[
+      {id:'gratitude3', text:'Write 3 things you\'re grateful for', pts:20},
+      {id:'walk10', text:'Take a 10‑minute walk', pts:15},
+      {id:'water', text:'Drink a full glass of water', pts:10},
+      {id:'breathe', text:'Do one 2‑minute breathing session', pts:15},
+      {id:'message', text:'Send a kind message to someone', pts:15},
+      {id:'journal', text:'Write at least 120 characters in your journal', pts:20},
+      {id:'screen', text:'5‑minute screen break', pts:10},
+      {id:'stretch', text:'Do light stretching for 3 minutes', pts:10},
+    ];
+    function getTodayQuests(){
+      const last = load(STORAGE.lastQuestDate, null);
+      let state = load('lunora_quests', {});
+      if(last !== todayKey()){
+        const shuffled = [...QUEST_POOL].sort(()=>Math.random()-0.5);
+        state = { date: todayKey(), items: shuffled.slice(0,3).map(q=>({...q, done:false})) };
+        save('lunora_quests', state); save(STORAGE.lastQuestDate, todayKey());
+      }
+      return state.items||[];
+    }
+    function renderQuests(){
+      const list=$('#questsList'); list.innerHTML='';
+      const items=getTodayQuests();
+      for(const q of items){
+        const row=document.createElement('label'); row.className='quest';
+        row.innerHTML=`<input type="checkbox" ${q.done?'checked':''} data-quest="${q.id}"> <div><div>${q.text}</div><div class="meta">${q.pts} pts</div></div>`;
+        list.appendChild(row);
+      }
+      $$('#questsList [data-quest]').forEach(cb=> cb.addEventListener('change', ()=> toggleQuest(cb.getAttribute('data-quest'), cb.checked)));
+      updatePoints(); updateStreak(); renderBadges();
+    }
+    function toggleQuest(id, done){
+      const state = load('lunora_quests', {items:[]});
+      const item = state.items.find(x=>x.id===id);
+      if(item){ item.done = done; save('lunora_quests', state); }
+      if(done){ const pts = load(STORAGE.points, 0) + (item?.pts||0); save(STORAGE.points, pts); dropConfetti(); }
+      else { const pts = Math.max(0, load(STORAGE.points, 0) - (item?.pts||0)); save(STORAGE.points, pts); }
+      updatePoints();
+      if(state.items.every(x=>x.done)){
+        const last=load(STORAGE.lastQuestDate, todayKey());
+        if(last===todayKey()){ const s=load(STORAGE.streak,0)+1; save(STORAGE.streak,s); toast('Daily quests complete! Streak +1 🔥'); save(STORAGE.lastQuestDate,'completed-'+todayKey()); renderBadges(); }
+      }
+      updateDashboard();
+    }
+    const updatePoints=()=> $('#points').textContent = load(STORAGE.points,0);
+    const updateStreak=()=> $('#streak').textContent = load(STORAGE.streak,0);
+    function renderBadges(){
+      const s=load(STORAGE.streak,0), p=load(STORAGE.points,0);
+      const wrap=$('#badges'); wrap.innerHTML='';
+      const badges=[]; if(s>=1) badges.push({icon:'🌱',label:'Day 1'}); if(s>=3) badges.push({icon:'🎖️',label:'3‑Day'}); if(s>=7) badges.push({icon:'🏆',label:'1‑Week'}); if(p>=100) badges.push({icon:'💫',label:'100+'});
+      badges.forEach(b=>{ const el=document.createElement('div'); el.className='chip'; el.innerHTML=`<span style="font-size:18px">${b.icon}</span> ${b.label}`; wrap.appendChild(el); })
+    }
+
+    // ======= SOS =======
+    function renderContact(){
+      const p=load(STORAGE.profile,{});
+      if(p.ecName && p.ecMethod){ $('#sosTip').textContent = `Saved: ${p.ecName} (${p.ecMethod})`; $('#sosName').value=p.ecName; $('#sosMethod').value=p.ecMethod; } else { $('#sosTip').textContent='Add a trusted person (phone or email).'; }
+    }
+    $('#saveContactBtn').addEventListener('click', ()=>{
+      const p=load(STORAGE.profile,{}); p.ecName=$('#sosName').value.trim(); p.ecMethod=$('#sosMethod').value.trim();
+      if(!p.ecName || !p.ecMethod){ alert('Please enter name and phone/email.'); return; }
+      save(STORAGE.profile,p); renderContact(); toast('Contact saved'); updateDashboard();
+    });
+    $('#testSOSBtn').addEventListener('click', ()=> openSOS('This is a test message from Lunora to check SOS.'));
+    function openSOS(prefill){
+      const p=load(STORAGE.profile,{}); if(!p.ecName||!p.ecMethod){ alert('Please add an emergency contact first.'); return; }
+      $('#dlgSOSName').textContent = p.ecName;
+      const msg = `${p.ecName},
+
+I\'m using Lunora and I may need support right now. Could you please check in with me?
+
+Message generated at ${new Date().toLocaleString()}.`;
+      $('#sosMessage').value = prefill || msg; $('#sosModal').classList.add('active');
+    }
+    $('#closeSOS').addEventListener('click', ()=> $('#sosModal').classList.remove('active'));
+    $('#copySOS').addEventListener('click', async ()=>{ await navigator.clipboard.writeText($('#sosMessage').value); toast('Copied to clipboard'); });
+    $('#emailSOS').addEventListener('click', ()=>{
+      const p=load(STORAGE.profile,{}); if(!p.ecMethod) return; const subject=encodeURIComponent('Checking in on me'); const body=encodeURIComponent($('#sosMessage').value);
+      window.location.href=`mailto:${encodeURIComponent(p.ecMethod)}?subject=${subject}&body=${body}`;
+    });
+    $('#contactNowBtn').addEventListener('click', ()=> openSOS());
+    $('#showResourcesBtn').addEventListener('click', ()=> $('#resources').scrollIntoView({behavior:'smooth'}));
+
+    // ======= Breathing =======
+    const breath={ running:false, t:0,
+      open(){ $('#breathModal').classList.add('active'); this.running=true; this.t=0; this.loop(); },
+      close(){ $('#breathModal').classList.remove('active'); this.running=false; },
+      loop(){ if(!this.running) return; this.t+=16; const cycle=14000; const phase=this.t%cycle; let frac; if(phase<4000) frac=phase/4000; else if(phase<8000) frac=1; else frac=1-(phase-8000)/6000; const len=2*Math.PI*90; const dash=len*frac; $('#breathAnim').setAttribute('stroke-dasharray', `${dash} ${1000}`); requestAnimationFrame(()=>this.loop()); }
+    };
+    function openBreathing(){ breath.open(); toggleQuest('breathe', true); }
+    $('#breathQuick').addEventListener('click', openBreathing);
+    $('#closeBreath').addEventListener('click', ()=> breath.close());
+
+    // ======= Export =======
+    $('#exportBtn').addEventListener('click', ()=>{
+      const blob = new Blob([JSON.stringify({profile:load(STORAGE.profile,{}), entries:load(STORAGE.entries,[]), points:load(STORAGE.points,0), streak:load(STORAGE.streak,0)}, null, 2)], {type:'application/json'});
+      const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`lunora-data-${todayKey()}.json`; a.click();
+    });
+
+    // ======= Confetti & Toast =======
+    function dropConfetti(){ const wrap=$('#confetti'); Array.from({length:24}).forEach(()=>{ const s=document.createElement('span'); s.textContent=['✨','🎉','💙','⭐','🫧'][Math.floor(Math.random()*5)]; s.style.position='absolute'; s.style.left=Math.random()*100+'vw'; s.style.top='-10vh'; s.style.transform=`rotate(${Math.random()*360}deg)`; wrap.appendChild(s); const d=2000+Math.random()*1500; s.animate([{transform:'translateY(-10vh) rotate(0deg)'},{transform:`translateY(110vh) rotate(${180+Math.random()*360}deg)`}],{duration:d, easing:'cubic-bezier(.2,.6,.2,1)'}).finished.then(()=> s.remove()); }); }
+    function toast(msg){ const t=document.createElement('div'); t.textContent=msg; t.style.position='fixed'; t.style.bottom='20px'; t.style.left='50%'; t.style.transform='translateX(-50%)'; t.style.background='rgba(12,20,40,.92)'; t.style.border='var(--border)'; t.style.padding='10px 14px'; t.style.borderRadius='12px'; t.style.zIndex='200'; document.body.appendChild(t); setTimeout(()=>{ t.animate([{opacity:1},{opacity:0}],{duration:420}).finished.then(()=> t.remove()) }, 1400); }
+
+    // ======= Dashboard sync =======
+    function updateDashboard(){
+      const p=load(STORAGE.profile,{}); $('#helloName').textContent = p.name? p.name : 'there';
+      $('#dPoints').textContent = load(STORAGE.points,0); $('#dStreak').textContent = load(STORAGE.streak,0);
+      const entries=load(STORAGE.entries,[]); const last=entries[0]; if(last){ const {moodLabel}=analyzeText(last.text); $('#dMood').textContent=moodLabel; $('#dMoodEmoji').textContent=moodEmoji(moodLabel); } else { $('#dMood').textContent='—'; $('#dMoodEmoji').textContent='—'; }
+      renderSpark(); renderContact();
+    }
+
+    // ======= Onboarding (About + Hints) =======
+    function maybeShowIntro(){
+      const run = load(STORAGE.firstRun, null);
+      if(!run){ $('#aboutModal').classList.add('active'); setTimeout(()=>{ $('#hintProfile').style.display='block'; $('#hintQA').style.display='block'; }, 600); }
+    }
+    $('#startNow').addEventListener('click', ()=>{ $('#aboutModal').classList.remove('active'); navTo('profile'); localStorage.setItem(STORAGE.firstRun, JSON.stringify({done:true})); });
+    $('#closeAbout').addEventListener('click', ()=>{ $('#aboutModal').classList.remove('active'); localStorage.setItem(STORAGE.firstRun, JSON.stringify({done:true})); });
+
+    // ======= Init =======
+    const year = new Date().getFullYear(); $('#year').textContent=year;
+    renderProfile(); renderEntries(); renderQuests(); updateDashboard(); maybeShowIntro();
+
+    // Analyze as user pauses
+    let timer; journalInput.addEventListener('input', ()=>{ clearTimeout(timer); timer=setTimeout(()=> renderAI(journalInput.value), 600); });
+
+    // Resize sparkline on window resize
+    addEventListener('resize', renderSpark);
+  </script>
+</body>
+</html>
