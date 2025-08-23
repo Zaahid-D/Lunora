@@ -12,6 +12,7 @@
       --good:#22c55e; --warn:#f59e0b; --bad:#ef4444;
       --glass: rgba(255,255,255,.08); --border: 1px solid rgba(255,255,255,.10);
       --radius: 18px; --shadow: 0 10px 30px rgba(7, 12, 26, .45);
+      --journal-bg: #fffaf0; --journal-txt: #3a3a3a; --journal-border: #d4b483;
     }
     *{box-sizing:border-box}
     html,body{height:100%}
@@ -46,20 +47,20 @@
     .btn.ghost{background:rgba(255,255,255,.1); color:var(--txt); border:var(--border)}
 
     /* Navbar logo styling */
-.logo img {
-  height: 40px;           /* default height */
-  width: auto;            /* maintain aspect ratio */
-  display: block;
-  margin-right: 10px;     /* space between logo and text */
-}
+    .logo img {
+      height: 40px;           /* default height */
+      width: auto;            /* maintain aspect ratio */
+      display: block;
+      margin-right: 10px;     /* space between logo and text */
+    }
 
-/* Optional: make it smaller on mobile */
-@media (max-width: 600px) {
-  .logo img {
-    height: 30px;
-    margin-right: 5px;
-  }
-}
+    /* Optional: make it smaller on mobile */
+    @media (max-width: 600px) {
+      .logo img {
+        height: 30px;
+        margin-right: 5px;
+      }
+    }
     /* ===== Router ===== */
     [data-page]{display:none}
     [data-page].active{display:block}
@@ -120,6 +121,328 @@
 
     /* Tooltips */
     .hint{position:absolute; background:#0f1b3e; border:var(--border); color:var(--txt); padding:8px 10px; border-radius:10px; font-size:12px; box-shadow:var(--shadow)}
+    
+    /* ===== NEW STYLES ===== */
+    /* Journal Book Design */
+    .journal-book {
+      background: var(--journal-bg);
+      color: var(--journal-txt);
+      border: 1px solid var(--journal-border);
+      border-radius: 8px;
+      padding: 20px;
+      min-height: 400px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      position: relative;
+      font-family: 'Georgia', serif;
+    }
+    .journal-book::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 10px;
+      background: linear-gradient(to right, rgba(0,0,0,0.1), transparent);
+      border-radius: 8px 0 0 8px;
+    }
+    .journal-book textarea {
+      background: transparent;
+      border: none;
+      color: var(--journal-txt);
+      font-size: 16px;
+      line-height: 1.6;
+      width: 100%;
+      min-height: 300px;
+      padding: 10px;
+      font-family: 'Georgia', serif;
+    }
+    .journal-book textarea:focus {
+      outline: none;
+    }
+    .journal-toolbar {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 15px;
+      align-items: center;
+    }
+    .speech-btn {
+      background: var(--ac);
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: white;
+      font-size: 18px;
+    }
+    .speech-btn.recording {
+      animation: pulse 1.5s infinite;
+      background: var(--bad);
+    }
+    
+    /* Journal Archive */
+    .journal-archive {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 15px;
+      margin-top: 20px;
+    }
+    .journal-entry-card {
+      background: var(--journal-bg);
+      color: var(--journal-txt);
+      border: 1px solid var(--journal-border);
+      border-radius: 8px;
+      padding: 15px;
+      height: 150px;
+      overflow: hidden;
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .journal-entry-card:hover {
+      transform: translateY(-5px);
+    }
+    .journal-entry-card h4 {
+      margin: 0 0 8px 0;
+      color: #5a3e1f;
+      border-bottom: 1px solid #d4b483;
+      padding-bottom: 5px;
+    }
+    .journal-entry-card p {
+      margin: 0;
+      font-size: 14px;
+      display: -webkit-box;
+      -webkit-line-clamp: 4;
+      line-clamp: 4;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    
+    /* Chatbot Styles */
+    .chatbot-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 1000;
+    }
+    .chatbot-toggle {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--ac), var(--ac2));
+      border: none;
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .chatbot-window {
+      position: absolute;
+      bottom: 70px;
+      right: 0;
+      width: 350px;
+      height: 450px;
+      background: rgba(12, 20, 40, 0.95);
+      border-radius: 18px;
+      border: var(--border);
+      backdrop-filter: blur(10px);
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      display: none;
+    }
+    .chatbot-window.active {
+      display: flex;
+    }
+    .chat-header {
+      padding: 15px;
+      background: rgba(6,12,26,0.8);
+      border-bottom: var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .chat-messages {
+      flex: 1;
+      padding: 15px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .message {
+      max-width: 80%;
+      padding: 10px 15px;
+      border-radius: 18px;
+      line-height: 1.4;
+    }
+    .message.user {
+      align-self: flex-end;
+      background: var(--ac);
+      border-bottom-right-radius: 5px;
+    }
+    .message.bot {
+      align-self: flex-start;
+      background: rgba(255,255,255,0.1);
+      border-bottom-left-radius: 5px;
+    }
+    .chat-input {
+      display: flex;
+      padding: 10px;
+      border-top: var(--border);
+      background: rgba(6,12,26,0.8);
+    }
+    .chat-input input {
+      flex: 1;
+      padding: 10px;
+      border-radius: 20px;
+      border: var(--border);
+      background: rgba(255,255,255,0.1);
+      color: var(--txt);
+    }
+    .chat-input button {
+      margin-left: 10px;
+      border: none;
+      background: var(--ac);
+      color: white;
+      border-radius: 20px;
+      padding: 10px 15px;
+      cursor: pointer;
+    }
+    
+    /* Notification Styles */
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(12,20,40,0.95);
+      border: var(--border);
+      border-radius: 12px;
+      padding: 15px;
+      max-width: 300px;
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow);
+      z-index: 1000;
+      display: none;
+    }
+    .notification.active {
+      display: block;
+      animation: slideIn 0.3s ease;
+    }
+    @keyframes slideIn {
+      from { transform: translateX(100px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    
+    /* Mood Tracking */
+    .mood-selector {
+      display: flex;
+      gap: 10px;
+      margin: 15px 0;
+      flex-wrap: wrap;
+    }
+    .mood-option {
+      background: rgba(255,255,255,0.1);
+      border: var(--border);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 20px;
+      transition: all 0.2s;
+    }
+    .mood-option:hover, .mood-option.selected {
+      transform: scale(1.2);
+      background: var(--ac);
+    }
+
+   
+  /* Enhanced Chatbot Styles */
+  .chatbot-typing {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 3px;
+    background: var(--ac);
+    opacity: 0.7;
+    animation: typingAnimation 1.4s infinite ease-in-out both;
+  }
+  .chatbot-typing:nth-child(1) { animation-delay: -0.32s; }
+  .chatbot-typing:nth-child(2) { animation-delay: -0.16s; }
+  @keyframes typingAnimation {
+    0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+    40% { transform: scale(1); opacity: 1; }
+  }
+  .suggestion-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+    padding: 0 10px 10px;
+  }
+  .suggestion-chip {
+    background: rgba(255, 255, 255, 0.1);
+    border: var(--border);
+    border-radius: 16px;
+    padding: 6px 12px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .suggestion-chip:hover {
+    background: var(--ac);
+    transform: translateY(-2px);
+  }
+
+  /* Enhanced Chatbot Styles */
+    .chatbot-typing {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      margin-right: 3px;
+      background: var(--ac);
+      opacity: 0.7;
+      animation: typingAnimation 1.4s infinite ease-in-out both;
+    }
+    .chatbot-typing:nth-child(1) { animation-delay: -0.32s; }
+    .chatbot-typing:nth-child(2) { animation-delay: -0.16s; }
+    @keyframes typingAnimation {
+      0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+      40% { transform: scale(1); opacity: 1; }
+    }
+    .suggestion-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+      padding: 0 10px 10px;
+    }
+    .suggestion-chip {
+      background: rgba(255, 255, 255, 0.1);
+      border: var(--border);
+      border-radius: 16px;
+      padding: 6px 12px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .suggestion-chip:hover {
+      background: var(--ac);
+      transform: translateY(-2px);
+    }
+
   </style>
 </head>
 <body>
@@ -258,21 +581,46 @@
         </div>
         <button class="btn ghost" onclick="navTo('dashboard')">← Back to Dashboard</button>
       </div>
-      <textarea id="journalInput" class="journal-area" placeholder="Start typing…"></textarea>
-      <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:10px">
+      
+      <!-- Mood Tracking -->
+      <div style="margin-bottom: 15px;">
+        <p class="meta">How are you feeling today?</p>
+        <div class="mood-selector">
+          <div class="mood-option" data-mood="1" title="Very Sad">😢</div>
+          <div class="mood-option" data-mood="2" title="Sad">😔</div>
+          <div class="mood-option" data-mood="3" title="Neutral">😐</div>
+          <div class="mood-option" data-mood="4" title="Good">🙂</div>
+          <div class="mood-option" data-mood="5" title="Great">😄</div>
+        </div>
+      </div>
+      
+      <!-- Journal Book Design -->
+      <div class="journal-book">
+        <textarea id="journalInput" placeholder="Dear Diary..."></textarea>
+      </div>
+      
+      <div class="journal-toolbar">
+        <button class="speech-btn" id="speechBtn" title="Speech to Text">🎤</button>
         <div class="meta"><span id="charCount">0</span> chars • <span id="moodScore">Mood: —</span></div>
         <div style="display:flex; gap:8px">
           <button class="btn ghost" id="analyzeBtn">Analyze ✨</button>
           <button class="btn primary" id="saveEntryBtn">Save Entry</button>
         </div>
       </div>
+      
       <div id="aiOutput" class="grid" style="margin-top:12px"></div>
       <div id="sosInlineBanner" class="sos-banner" style="display:none; margin-top:12px">
-        <strong>⚠️ We’re concerned.</strong> We detected strong distress language. Consider contacting your emergency person now.
+        <strong>⚠️ We're concerned.</strong> We detected strong distress language. Consider contacting your emergency person now.
         <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap">
           <button class="btn primary" onclick="openSOS()">Contact Now</button>
           <button class="btn ghost" onclick="navTo('sos')">Open SOS Page</button>
         </div>
+      </div>
+      
+      <!-- Journal Archive -->
+      <div style="margin-top: 30px;">
+        <h3>Your Journal Archive</h3>
+        <div id="journalArchive" class="journal-archive"></div>
       </div>
     </section>
 
@@ -281,7 +629,7 @@
       <div style="display:flex; justify-content:space-between; align-items:center; gap:12px">
         <div>
           <h2 style="margin:0 0 6px">Daily Quests</h2>
-          <p class="sub">Complete today’s 3 cards to grow your streak.</p>
+          <p class="sub">Complete today's 3 cards to grow your streak.</p>
         </div>
         <button class="btn ghost" onclick="navTo('dashboard')">← Back to Dashboard</button>
       </div>
@@ -318,7 +666,7 @@
         <button class="btn ghost" onclick="navTo('dashboard')">← Back to Dashboard</button>
       </div>
       <div class="sos-banner" id="sosBanner" style="display:none">
-        <strong>⚠️ We’re concerned.</strong> We detected strong distress language. Consider contacting <span id="contactNameBanner"></span> now, or dial your local emergency number.
+        <strong>⚠️ We're concerned.</strong> We detected strong distress language. Consider contacting <span id="contactNameBanner"></span> now, or dial your local emergency number.
         <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap">
           <button class="btn primary" id="contactNowBtn">Contact Now</button>
           <button class="btn ghost" id="showResourcesBtn">See Resources</button>
@@ -423,12 +771,63 @@
     </div>
   </div>
 
+<!-- AI Chatbot -->
+  <div class="chatbot-container">
+    <button class="chatbot-toggle" id="chatbotToggle">💬</button>
+    <div class="chatbot-window" id="chatbotWindow">
+      <div class="chat-header">
+        <div style="font-size: 24px;">🤖</div>
+        <div>
+          <h4 style="margin:0">Luna - Your AI Companion</h4>
+          <div class="meta">Here to listen without judgment</div>
+        </div>
+        <button class="btn ghost" style="margin-left: auto; padding: 4px 8px; font-size: 12px;" id="clearChatBtn">Clear</button>
+      </div>
+      <div class="chat-messages" id="chatMessages">
+        <div class="message bot">
+          Hi there! I'm Luna, your mental wellness companion. How are you feeling today?
+        </div>
+      </div>
+      <div class="suggestion-chips" id="suggestionChips">
+        <div class="suggestion-chip" data-msg="I'm feeling great today!">😊 I'm feeling good</div>
+        <div class="suggestion-chip" data-msg="I'm a bit anxious">😰 I'm anxious</div>
+        <div class="suggestion-chip" data-msg="I'm feeling sad">😔 I'm feeling down</div>
+        <div class="suggestion-chip" data-msg="I'm stressed about work">😫 I'm stressed</div>
+      </div>
+      <div class="chat-input">
+        <input type="text" id="chatInput" placeholder="Type your message...">
+        <button id="sendChatBtn">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification -->
+  <div class="notification" id="notification">
+    <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px">
+      <div style="font-size:20px">📝</div>
+      <h4 style="margin:0">Journal Reminder</h4>
+    </div>
+    <p style="margin:0">It looks like you haven't journaled today. Writing helps process emotions and track progress!</p>
+  </div>
+
   <div class="confetti" id="confetti"></div>
 
   <script>
     // ======= Shortcuts =======
     const $ = s=>document.querySelector(s), $$ = s=>Array.from(document.querySelectorAll(s));
-    const STORAGE = { entries:'lunora_entries', points:'lunora_points', streak:'lunora_streak', lastQuestDate:'lunora_lastQuestDate', questsState:'lunora_quests', profile:'lunora_profile', avatar:'lunora_avatar', firstRun:'lunora_firstRun' };
+    const STORAGE = { 
+      entries:'lunora_entries', 
+      points:'lunora_points', 
+      streak:'lunora_streak', 
+      lastQuestDate:'lunora_lastQuestDate', 
+      questsState:'lunora_quests', 
+      profile:'lunora_profile', 
+      avatar:'lunora_avatar', 
+      firstRun:'lunora_firstRun',
+      lastJournalDate: 'lunora_lastJournalDate',
+      chatHistory: 'lunora_chatHistory', 
+      moods: 'lunora_moods'
+    };
     const todayKey = ()=> new Date().toISOString().slice(0,10);
     const load=(k,f)=>{try{return JSON.parse(localStorage.getItem(k))??f}catch(e){return f}};
     const save=(k,v)=>localStorage.setItem(k, JSON.stringify(v));
@@ -441,7 +840,11 @@
       setActiveNav(id);
       if(id==='entries') renderEntries();
       if(id==='quests') renderQuests();
-      if(id==='journal') $('#journalInput').focus();
+      if(id==='journal') { 
+        $('#journalInput').focus();
+        renderJournalArchive();
+        checkJournalReminder();
+      }
       if(id==='profile') renderProfile();
       if(id==='sos') renderContact();
     }
@@ -497,11 +900,34 @@
     $('#analyzeBtn').addEventListener('click', ()=> renderAI(journalInput.value));
     $('#saveEntryBtn').addEventListener('click', ()=>{
       const text = journalInput.value.trim(); if(!text){ alert('Write something first.'); return; }
-      const entry = { id: crypto.randomUUID(), date:new Date().toISOString(), text };
+      const selectedMood = $('.mood-option.selected')?.dataset.mood || '3';
+      const entry = { id: crypto.randomUUID(), date:new Date().toISOString(), text, mood: selectedMood };
       const entries = load(STORAGE.entries, []); entries.unshift(entry); save(STORAGE.entries, entries);
+      
+      // Save mood data
+      const moods = load(STORAGE.moods, {});
+      const today = todayKey();
+      moods[today] = selectedMood;
+      save(STORAGE.moods, moods);
+      
+      // Update last journal date
+      save(STORAGE.lastJournalDate, todayKey());
+      
       renderEntries(); renderAI(text); journalInput.value=''; $('#charCount').textContent=0; toast('Entry saved');
       if(text.length>=120) toggleQuest('journal', true);
       updateDashboard();
+      renderJournalArchive();
+      
+      // Reset mood selection
+      $$('.mood-option').forEach(opt => opt.classList.remove('selected'));
+    });
+
+    // Mood selection
+    $$('.mood-option').forEach(opt => {
+      opt.addEventListener('click', () => {
+        $$('.mood-option').forEach(o => o.classList.remove('selected'));
+        opt.classList.add('selected');
+      });
     });
 
     function analyzeText(text){
@@ -546,6 +972,44 @@
       if(risky){ $('#sosBanner').style.display='block'; $('#sosInlineBanner').style.display='block'; const p=load(STORAGE.profile,{}); $('#contactNameBanner').textContent=p.ecName||'your emergency contact'; }
     }
 
+    // ======= Journal Archive =======
+    function renderJournalArchive() {
+      const entries = load(STORAGE.entries, []);
+      const archive = $('#journalArchive');
+      
+      if (!entries.length) {
+        archive.innerHTML = '<div class="meta">No journal entries yet. Start writing to see them appear here.</div>';
+        return;
+      }
+      
+      archive.innerHTML = '';
+      entries.slice(0, 6).forEach(entry => {
+        const date = new Date(entry.date).toLocaleDateString();
+        const preview = entry.text.length > 120 ? entry.text.substring(0, 120) + '...' : entry.text;
+        const moodEmojis = ['😢', '😔', '😐', '🙂', '😄'];
+        const moodEmoji = moodEmojis[parseInt(entry.mood || '3') - 1] || '😐';
+        
+        const card = document.createElement('div');
+        card.className = 'journal-entry-card';
+        card.innerHTML = `
+          <h4>${date} ${moodEmoji}</h4>
+          <p>${preview}</p>
+        `;
+        card.addEventListener('click', () => {
+          journalInput.value = entry.text;
+          $$('.mood-option').forEach(opt => {
+            if (opt.dataset.mood === entry.mood) {
+              opt.classList.add('selected');
+            } else {
+              opt.classList.remove('selected');
+            }
+          });
+          window.scrollTo(0, 0);
+        });
+        archive.appendChild(card);
+      });
+    }
+
     // ======= Entries =======
     function renderEntries(){
       const entries = load(STORAGE.entries, []);
@@ -570,6 +1034,7 @@
       $$('#entriesList [data-del]').forEach(btn=> btn.addEventListener('click', ()=>{
         const id = btn.getAttribute('data-del');
         const entries = load(STORAGE.entries, []).filter(x=>x.id!==id); save(STORAGE.entries, entries); renderEntries(); updateDashboard();
+        renderJournalArchive();
       }));
       renderSpark();
     }
@@ -695,15 +1160,606 @@ Message generated at ${new Date().toLocaleString()}.`;
     $('#startNow').addEventListener('click', ()=>{ $('#aboutModal').classList.remove('active'); navTo('profile'); localStorage.setItem(STORAGE.firstRun, JSON.stringify({done:true})); });
     $('#closeAbout').addEventListener('click', ()=>{ $('#aboutModal').classList.remove('active'); localStorage.setItem(STORAGE.firstRun, JSON.stringify({done:true})); });
 
+    // ======= Speech to Text =======
+    let recognition = null;
+    $('#speechBtn').addEventListener('click', toggleSpeechRecognition);
+
+    function toggleSpeechRecognition() {
+      if (!('webkitSpeechRecognition' in window)) {
+        alert("Speech recognition is not supported in this browser.");
+        return;
+      }
+      
+      if (!recognition) {
+        recognition = new webkitSpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = true;
+        recognition.lang = 'en-US';
+        
+        recognition.onstart = () => {
+          $('#speechBtn').classList.add('recording');
+          $('#speechBtn').title = "Stop Recording";
+        };
+        
+        recognition.onresult = (event) => {
+          let transcript = '';
+          for (let i = event.resultIndex; i < event.results.length; i++) {
+            if (event.results[i].isFinal) {
+              transcript += event.results[i][0].transcript;
+            }
+          }
+          
+          if (transcript) {
+            journalInput.value += transcript + ' ';
+            $('#charCount').textContent = journalInput.value.length;
+          }
+        };
+        
+        recognition.onend = () => {
+          $('#speechBtn').classList.remove('recording');
+          $('#speechBtn').title = "Speech to Text";
+        };
+        
+        recognition.onerror = (event) => {
+          console.error('Speech recognition error', event.error);
+          $('#speechBtn').classList.remove('recording');
+          $('#speechBtn').title = "Speech to Text";
+        };
+      }
+      
+      if ($('#speechBtn').classList.contains('recording')) {
+        recognition.stop();
+      } else {
+        recognition.start();
+      }
+    }
+
+    // ======= Journal Reminder System =======
+    function checkJournalReminder() {
+      const lastJournalDate = load(STORAGE.lastJournalDate, '');
+      const today = todayKey();
+      
+      if (lastJournalDate !== today) {
+        // Check if it's later in the day (after 6 PM)
+        const now = new Date();
+        if (now.getHours() >= 18) {
+          // Show reminder notification
+          showNotification();
+        }
+      }
+    }
+    
+    function showNotification() {
+      const notification = $('#notification');
+      notification.classList.add('active');
+      
+      setTimeout(() => {
+        notification.classList.remove('active');
+      }, 5000);
+    }
+
+    // ======= Mood Tracking =======
+    function trackMood(moodValue) {
+      const moods = load(STORAGE.moods, {});
+      const today = todayKey();
+      moods[today] = moodValue;
+      save(STORAGE.moods, moods);
+    }
+
+    // ======= Enhanced AI Chatbot =======
+    // Emotional analysis keywords
+    const EMOTION_KEYWORDS = {
+      happy: ['happy', 'good', 'great', 'excited', 'joy', 'joyful', 'wonderful', 'amazing', 'fantastic', 'better', 'relieved', 'proud', 'grateful', 'thankful', 'content', 'peaceful', 'optimistic', 'hopeful', 'cheerful'],
+      sad: ['sad', 'depressed', 'unhappy', 'miserable', 'hopeless', 'tearful', 'down', 'low', 'blue', 'grief', 'heartbroken', 'disappointed', 'hurt', 'sorrow', 'melancholy', 'despair', 'gloomy'],
+      anxious: ['anxious', 'nervous', 'worried', 'stressed', 'panic', 'overwhelmed', 'tense', 'uneasy', 'apprehensive', 'fear', 'scared', 'afraid', 'dread', 'panic', 'worrisome', 'restless', 'jittery'],
+      angry: ['angry', 'mad', 'furious', 'irritated', 'annoyed', 'frustrated', 'resentful', 'outraged', 'bitter', 'hostile', 'agitated', 'irked', 'livid', 'fuming'],
+      tired: ['tired', 'exhausted', 'fatigued', 'weary', 'drained', 'burned out', 'sleepy', 'lethargic', 'spent', 'worn out', 'run down', 'sleep-deprived'],
+      lonely: ['lonely', 'alone', 'isolated', 'abandoned', 'empty', 'unwanted', 'disconnected', 'secluded', 'forsaken', 'left out'],
+      confused: ['confused', 'uncertain', 'unsure', 'indecisive', 'perplexed', 'puzzled', 'bewildered', 'disoriented', 'lost', 'torn'],
+      motivated: ['motivated', 'determined', 'focused', 'driven', 'inspired', 'ambitious', 'energized', 'purposeful', 'committed']
+    };
+
+    // Contextual memory for conversation flow
+    let conversationContext = {
+      currentTopic: '',
+      emotionalState: '',
+      mentionedIssues: [],
+      lastResponseType: '',
+      userName: ''
+    };
+
+    // Response templates with more variety and depth
+    const RESPONSE_TEMPLATES = {
+      greeting: [
+        "Hi there! How are you feeling today?",
+        "Hello! It's good to see you. How has your day been?",
+        "Hey! I'm here to listen. What's on your mind?",
+        "Hi! How are things going for you today?"
+      ],
+      happy: [
+        "That's wonderful to hear! 😊 What's contributing to these positive feelings?",
+        "I'm so glad you're feeling good! 🌟 Would you like to share what's making you happy?",
+        "It's great that you're in a positive space! Would you like to do a quick gratitude exercise to amplify these feelings?",
+        "Happy to hear you're doing well! Remember to savor these positive moments. What's been going well for you?"
+      ],
+      sad: [
+        "I'm sorry to hear you're feeling down. 😔 Would you like to talk more about what's going on?",
+        "It sounds like you're having a tough time. I'm here to listen without judgment. What's on your mind?",
+        "Thank you for sharing that with me. It takes courage to acknowledge when we're feeling low. Would a breathing exercise help right now?",
+        "I hear you. Sometimes just putting these feelings into words can help. Would you like to continue sharing?"
+      ],
+      anxious: [
+        "It sounds like you're feeling some anxiety. 😰 Would you like to try a quick grounding exercise together?",
+        "I understand that anxious feeling. Let's take a moment to breathe. Would you like to share what's specifically worrying you?",
+        "Anxiety can be really challenging. Remember that these feelings are temporary. What's one small thing that might help you feel a bit calmer?",
+        "Thank you for naming that anxiety. Sometimes just identifying it can reduce its power. Would you like to talk through what's triggering these feelings?"
+      ],
+      angry: [
+        "It sounds like you're feeling some strong emotions. 😠 Would you like to talk about what's causing these feelings?",
+        "Anger is a valid emotion that often signals when our boundaries have been crossed. Want to explore what might be behind these feelings?",
+        "I hear your frustration. Sometimes writing about what's making us angry can help process it. Would you like to try that?",
+        "It's okay to feel angry. What's one healthy way you might channel this energy?"
+      ],
+      tired: [
+        "It sounds like you're feeling drained. 😴 Have you been able to get enough rest recently?",
+        "I hear that exhaustion. Sometimes we need to give ourselves permission to rest. What's one small way you could practice self-care today?",
+        "Fatigue can really impact our mental health. Have you noticed any patterns to when you feel most tired?",
+        "Being tired makes everything harder. What's one thing that usually helps you recharge, even a little?"
+      ],
+      lonely: [
+        "I hear that loneliness. 😔 Connection is a fundamental human need. Is there someone you might reach out to today, even briefly?",
+        "Loneliness can be really painful. Remember that many people experience this, especially nowadays. Would you like to talk about what kind of connection you're missing?",
+        "Thank you for sharing that. Would you like to try a journaling exercise about relationships and connection?",
+        "I'm here with you. Sometimes acknowledging the loneliness can lessen its intensity. What does connection look like for you?"
+      ],
+      confused: [
+        "It sounds like you're feeling uncertain. 🤔 Would it help to talk through the options you're considering?",
+        "Feeling confused or indecisive is completely normal. Sometimes listing pros and cons can bring clarity. Would you like to try that?",
+        "I understand that feeling of being unsure. What aspects are you most conflicted about?",
+        "It's okay not to have all the answers right now. What's one small step you could take to gain more clarity?"
+      ],
+      motivated: [
+        "That's fantastic! 😃 Having motivation can be such a powerful force. What are you feeling inspired to do?",
+        "It's great to hear you're feeling motivated! What's sparked this energy?",
+        "I love hearing about your motivation! How can you harness this energy to work toward your goals?",
+        "That drive and determination is wonderful to see! What's your plan for channeling this motivation?"
+      ],
+      neutral: [
+        "Thanks for sharing. Would you like to talk more about what's going on?",
+        "I appreciate you checking in. Is there anything specific you'd like to discuss today?",
+        "How has your week been so far?",
+        "Is there anything on your mind that you'd like to explore together?"
+      ],
+      supportive: [
+        "Remember to be kind to yourself today. You're doing the best you can. 💙",
+        "It's okay to not have all the answers. Taking things one step at a time is enough.",
+        "Whatever you're feeling is valid. Your emotions are information, not instructions.",
+        "You're not alone in this. I'm here to support you however I can.",
+        "Progress isn't always linear. It's okay to have ups and downs."
+      ],
+      resources: [
+        "Would you like me to suggest a quick mindfulness exercise?",
+        "I can guide you through a breathing technique if that might help.",
+        "Sometimes writing in your journal can help process these feelings. Would you like to try that?",
+        "Would a gratitude practice be helpful right now?",
+        "Would you like to try a quick grounding exercise to help you feel more present?"
+      ],
+      followUp: [
+        "How does that make you feel?",
+        "What do you think about that?",
+        "Can you tell me more about that?",
+        "What else is coming up for you as we talk about this?",
+        "How long have you been feeling this way?"
+      ],
+      checkIn: [
+        "How are you feeling now after talking about this?",
+        "What's coming up for you as we discuss this?",
+        "Does putting this into words help at all?",
+        "What part of this feels most significant to you?"
+      ]
+    };
+
+    // Mental health resources and techniques
+    const MENTAL_HEALTH_RESOURCES = {
+      breathing: {
+        name: "Box Breathing",
+        steps: "Inhale for 4 counts, hold for 4 counts, exhale for 4 counts, hold for 4 counts. Repeat 4 times.",
+        prompt: "Would you like to try a quick breathing exercise together?"
+      },
+      grounding: {
+        name: "5-4-3-2-1 Grounding",
+        steps: "Name 5 things you can see, 4 things you can feel, 3 things you can hear, 2 things you can smell, and 1 thing you can taste.",
+        prompt: "Would you like to try a grounding exercise to help you feel more present?"
+      },
+      journaling: {
+        name: "Journaling Prompt",
+        steps: "Write about what you're feeling without judgment. Try completing this sentence: 'Right now, I feel...'",
+        prompt: "Would you like to try a journaling exercise to process these feelings?"
+      },
+      gratitude: {
+        name: "Three Good Things",
+        steps: "Name three things you're grateful for today, no matter how small.",
+        prompt: "Would a gratitude practice be helpful right now?"
+      }
+    };
+
+    // Initialize chatbot with enhanced functionality
+    function initChatbot() {
+      // Load chat history
+      const chatHistory = load(STORAGE.chatHistory, []);
+      const chatMessages = $('#chatMessages');
+      
+      // Only restore history if it's from today
+      const today = todayKey();
+      const todayHistory = chatHistory.filter(msg => msg.timestamp.startsWith(today));
+      
+      // Load user profile for personalization
+      const profile = load(STORAGE.profile, {});
+      if (profile.name) {
+        conversationContext.userName = profile.name;
+      }
+      
+      if (todayHistory.length > 0) {
+        chatMessages.innerHTML = '';
+        todayHistory.forEach(msg => {
+          addMessageToChat(msg.message, msg.sender, false);
+        });
+        
+        // Analyze last conversation for context
+        if (todayHistory.length > 2) {
+          const lastUserMessage = todayHistory.filter(msg => msg.sender === 'user').pop();
+          if (lastUserMessage) {
+            const emotionAnalysis = analyzeEmotion(lastUserMessage.message);
+            conversationContext.emotionalState = emotionAnalysis.dominant;
+          }
+        }
+      } else {
+        // Add personalized welcome message
+        const welcomeMessage = conversationContext.userName 
+          ? `Hi ${conversationContext.userName}! I'm Luna, your mental wellness companion. How are you feeling today?`
+          : "Hi there! I'm Luna, your mental wellness companion. How are you feeling today?";
+        
+        addMessageToChat(welcomeMessage, 'bot', false);
+      }
+      
+      // Setup event listeners
+      $('#sendChatBtn').addEventListener('click', sendChatMessage);
+      $('#chatInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendChatMessage();
+      });
+      
+      // Suggestion chips with more relevant options
+      updateSuggestionChips();
+      
+      // Clear chat button
+      $('#clearChatBtn').addEventListener('click', () => {
+        if (confirm("Clear all chat history?")) {
+          $('#chatMessages').innerHTML = '';
+          save(STORAGE.chatHistory, []);
+          addMessageToChat("Chat cleared. How are you feeling today?", 'bot', true);
+          conversationContext = {
+            currentTopic: '',
+            emotionalState: '',
+            mentionedIssues: [],
+            lastResponseType: '',
+            userName: conversationContext.userName
+          };
+        }
+      });
+    }
+
+    // Enhanced emotional analysis with context awareness
+    function analyzeEmotion(text) {
+      const cleanText = text.toLowerCase();
+      const emotions = {
+        happy: 0,
+        sad: 0,
+        anxious: 0,
+        angry: 0,
+        tired: 0,
+        lonely: 0,
+        confused: 0,
+        motivated: 0
+      };
+      
+      // Count emotion keywords with weighting
+      for (const [emotion, keywords] of Object.entries(EMOTION_KEYWORDS)) {
+        emotions[emotion] = keywords.filter(word => {
+          const regex = new RegExp(`\\b${word}\\b`, 'i');
+          return regex.test(cleanText);
+        }).length;
+      }
+      
+      // Detect emotional intensity through modifiers
+      const intensityModifiers = {
+        very: 2, really: 2, extremely: 3, incredibly: 3, 
+        somewhat: 0.5, slightly: 0.5, aBit: 0.5, kindOf: 0.5
+      };
+      
+      for (const [modifier, weight] of Object.entries(intensityModifiers)) {
+        if (cleanText.includes(modifier)) {
+          for (const emotion in emotions) {
+            emotions[emotion] *= weight;
+          }
+        }
+      }
+      
+      // Detect negation patterns
+      const negationPattern = /\b(not|never|no|don't|can't|won't|nobody|nothing|nowhere|neither|never|hardly|scarcely|barely)\b/;
+      if (negationPattern.test(cleanText)) {
+        emotions.sad += 2;
+        emotions.anxious += 1;
+      }
+      
+      // Detect positive language
+      const positivePattern = /\b(yes|good|great|love|wonderful|awesome|excellent|perfect|nice|happy|joy|pleasure|delight)\b/;
+      if (positivePattern.test(cleanText)) {
+        emotions.happy += 2;
+      }
+      
+      // Detect question patterns
+      const questionPattern = /\?/;
+      const isQuestion = questionPattern.test(cleanText);
+      
+      // Find dominant emotion
+      let dominantEmotion = 'neutral';
+      let maxScore = 0;
+      
+      for (const [emotion, score] of Object.entries(emotions)) {
+        if (score > maxScore) {
+          maxScore = score;
+          dominantEmotion = emotion;
+        }
+      }
+      
+      // If it's a question but no strong emotion detected
+      if (maxScore === 0 && isQuestion) {
+        dominantEmotion = 'question';
+      }
+      
+      return {
+        emotions,
+        dominant: maxScore > 0 ? dominantEmotion : 'neutral',
+        intensity: maxScore,
+        isQuestion: isQuestion
+      };
+    }
+
+    // Update suggestion chips based on context
+    function updateSuggestionChips() {
+      const chipsContainer = $('#suggestionChips');
+      chipsContainer.innerHTML = '';
+      
+      let suggestions = [];
+      
+      if (conversationContext.emotionalState) {
+        // Contextual suggestions based on emotional state
+        switch(conversationContext.emotionalState) {
+          case 'sad':
+            suggestions = [
+              {msg: "I've been feeling really down lately", text: "😔 I've been feeling down"},
+              {msg: "Nothing seems to make me happy anymore", text: "😞 Nothing makes me happy"},
+              {msg: "I just need someone to talk to", text: "💬 I need to talk"}
+            ];
+            break;
+          case 'anxious':
+            suggestions = [
+              {msg: "I'm feeling really anxious about everything", text: "😰 I'm feeling anxious"},
+              {msg: "I can't stop worrying", text: "😣 I can't stop worrying"},
+              {msg: "I need help calming down", text: "🧘 Help me calm down"}
+            ];
+            break;
+          case 'angry':
+            suggestions = [
+              {msg: "I'm so frustrated with everything", text: "😠 I'm frustrated"},
+              {msg: "I don't know how to handle my anger", text: "🔥 Handling anger"},
+              {msg: "Everything is making me irritated", text: "⚡ Everything irritates me"}
+            ];
+            break;
+          default:
+            suggestions = [
+              {msg: "I'm feeling great today!", text: "😊 I'm feeling good"},
+              {msg: "I'm a bit anxious", text: "😰 I'm anxious"},
+              {msg: "I'm feeling sad", text: "😔 I'm feeling down"},
+              {msg: "I'm stressed about work", text: "😫 I'm stressed"}
+            ];
+        }
+      } else {
+        // Default suggestions
+        suggestions = [
+          {msg: "I'm feeling great today!", text: "😊 I'm feeling good"},
+          {msg: "I'm a bit anxious", text: "😰 I'm anxious"},
+          {msg: "I'm feeling sad", text: "😔 I'm feeling down"},
+          {msg: "I'm stressed about work", text: "😫 I'm stressed"}
+        ];
+      }
+      
+      // Add suggestion chips
+      suggestions.forEach(suggestion => {
+        const chip = document.createElement('div');
+        chip.className = 'suggestion-chip';
+        chip.setAttribute('data-msg', suggestion.msg);
+        chip.textContent = suggestion.text;
+        chip.addEventListener('click', () => {
+          $('#chatInput').value = chip.getAttribute('data-msg');
+          sendChatMessage();
+        });
+        chipsContainer.appendChild(chip);
+      });
+    }
+
+    // Enhanced response generation with context awareness
+    function generateResponse(userMessage, emotionAnalysis) {
+      const { dominant, intensity, isQuestion } = emotionAnalysis;
+      let responses = [];
+      
+      // Update conversation context
+      conversationContext.emotionalState = dominant;
+      conversationContext.lastResponseType = 'emotional';
+      
+      // Check for specific mental health concerns that need careful handling
+      const riskKeywords = KEYWORDS.risk;
+      const hasRiskLanguage = riskKeywords.some(word => userMessage.toLowerCase().includes(word));
+      
+      if (hasRiskLanguage) {
+        // Handle crisis language with care
+        const profile = load(STORAGE.profile, {});
+        const contactName = profile.ecName || 'someone you trust';
+        
+        responses.push("I'm really concerned about what you're sharing. It sounds like you're in significant pain.");
+        responses.push(`Please consider reaching out to ${contactName} or a mental health professional right now.`);
+        responses.push("You don't have to go through this alone. There are people who want to help.");
+        
+        // Show SOS resources
+        $('#sosBanner').style.display = 'block';
+        $('#sosInlineBanner').style.display = 'block';
+        $('#contactNameBanner').textContent = contactName;
+        
+        return responses.join(' ');
+      }
+      
+      // Add emotion-specific response
+      if (RESPONSE_TEMPLATES[dominant]) {
+        const emotionResponse = RESPONSE_TEMPLATES[dominant][
+          Math.floor(Math.random() * RESPONSE_TEMPLATES[dominant].length)
+        ];
+        responses.push(emotionResponse);
+      }
+      
+      // For stronger emotions, add a supportive message
+      if (intensity > 1 && !['happy', 'motivated', 'neutral'].includes(dominant)) {
+        const supportiveResponse = RESPONSE_TEMPLATES.supportive[
+          Math.floor(Math.random() * RESPONSE_TEMPLATES.supportive.length)
+        ];
+        responses.push(supportiveResponse);
+      }
+      
+      // Add a resource suggestion for moderate to strong emotions
+      if (intensity > 0 && !['happy', 'motivated'].includes(dominant)) {
+        // Select appropriate resource based on emotional state
+        let resourceType;
+        switch(dominant) {
+          case 'anxious':
+            resourceType = Math.random() > 0.5 ? 'breathing' : 'grounding';
+            break;
+          case 'sad':
+          case 'lonely':
+            resourceType = Math.random() > 0.5 ? 'journaling' : 'gratitude';
+            break;
+          default:
+            resourceType = ['breathing', 'grounding', 'journaling', 'gratitude'][
+              Math.floor(Math.random() * 4)
+            ];
+        }
+        
+        responses.push(MENTAL_HEALTH_RESOURCES[resourceType].prompt);
+        conversationContext.lastResponseType = 'resource';
+        conversationContext.currentTopic = resourceType;
+      }
+      
+      // Add follow-up question for deeper exploration
+      if (intensity > 0 && Math.random() > 0.3) {
+        const followUp = RESPONSE_TEMPLATES.followUp[
+          Math.floor(Math.random() * RESPONSE_TEMPLATES.followUp.length)
+        ];
+        responses.push(followUp);
+        conversationContext.lastResponseType = 'followUp';
+      }
+      
+      // Default response if nothing else applies
+      if (responses.length === 0) {
+        responses.push(RESPONSE_TEMPLATES.neutral[
+          Math.floor(Math.random() * RESPONSE_TEMPLATES.neutral.length)
+        ]);
+      }
+      
+      return responses.join(' ');
+    }
+
+    // Enhanced send message function
+    function sendChatMessage() {
+      const input = $('#chatInput');
+      const message = input.value.trim();
+      if (!message) return;
+      
+      // Add user message to chat
+      addMessageToChat(message, 'user');
+      input.value = '';
+      
+      // Show typing indicator
+      const typingIndicator = document.createElement('div');
+      typingIndicator.className = 'message bot';
+      typingIndicator.id = 'typingIndicator';
+      typingIndicator.innerHTML = `
+        <div style="display:flex; align-items:center;">
+          <div class="chatbot-typing"></div>
+          <div class="chatbot-typing"></div>
+          <div class="chatbot-typing"></div>
+        </div>
+      `;
+      $('#chatMessages').appendChild(typingIndicator);
+      $('#chatMessages').scrollTop = $('#chatMessages').scrollHeight;
+      
+      // Analyze emotion and generate response (with variable delay to simulate thinking)
+      const delay = 1000 + Math.random() * 1000; // Between 1-2 seconds
+      
+      setTimeout(() => {
+        const emotionAnalysis = analyzeEmotion(message);
+        const response = generateResponse(message, emotionAnalysis);
+        
+        // Remove typing indicator
+        const indicator = $('#typingIndicator');
+        if (indicator) indicator.remove();
+        
+        // Add response to chat
+        addMessageToChat(response, 'bot');
+        
+        // Update suggestion chips based on new context
+        updateSuggestionChips();
+      }, delay);
+    }
+
+    // Enhanced add message function
+    function addMessageToChat(message, sender, saveToHistory = true) {
+      const chatMessages = $('#chatMessages');
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `message ${sender}`;
+      messageDiv.textContent = message;
+      chatMessages.appendChild(messageDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+      
+      // Save to chat history
+      if (saveToHistory) {
+        const chatHistory = load(STORAGE.chatHistory, []);
+        chatHistory.push({ 
+          sender, 
+          message, 
+          timestamp: new Date().toISOString() 
+        });
+        save(STORAGE.chatHistory, chatHistory);
+      }
+    }
+
     // ======= Init =======
     const year = new Date().getFullYear(); $('#year').textContent=year;
     renderProfile(); renderEntries(); renderQuests(); updateDashboard(); maybeShowIntro();
+    renderJournalArchive();
 
-    // Analyze as user pauses
-    let timer; journalInput.addEventListener('input', ()=>{ clearTimeout(timer); timer=setTimeout(()=> renderAI(journalInput.value), 600); });
+    initChatbot();
 
-    // Resize sparkline on window resize
-    addEventListener('resize', renderSpark);
+  // ADD THIS CODE - Chatbot toggle functionality
+  $('#chatbotToggle').addEventListener('click', () => {
+    $('#chatbotWindow').classList.toggle('active');
+  });
+
+  // Analyze as user pauses
+  let timer; journalInput.addEventListener('input', ()=>{ clearTimeout(timer); timer=setTimeout(()=> renderAI(journalInput.value), 600); });
+
+  // Resize sparkline on window resize
+  addEventListener('resize', renderSpark);
+</script>
+
+    
   </script>
 </body>
 </html>
